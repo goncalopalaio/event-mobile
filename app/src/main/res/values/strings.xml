@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">event-mobile</string>
+    <string name="title_activity_events">Events</string>
+</resources>

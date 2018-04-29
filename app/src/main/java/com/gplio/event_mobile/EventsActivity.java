@@ -1,5 +1,6 @@
 package com.gplio.event_mobile;
 
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,19 +27,28 @@ import retrofit2.Response;
 
 public class EventsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static String TAG = "EventsActivity";
+    private ReportingApi.EventService eventService;
+    private LocationProvider locationProvider;
     private GoogleMap map;
+    private boolean hasPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_events);
+
+        // Request permissions
+        Permissions.requestPermissions(this);
+
+        // Request location updates
+        locationProvider = new LocationProvider();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView)
-                findViewById(R.id.bottom_navigation);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -58,31 +69,27 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
             }
         });
 
-        // @todo goncalo remove this after listing is implemented
-        final ReportingApi.EventService eventInstance = ReportingApi.getEventInstance();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                eventInstance.listAllEvents().enqueue(new Callback<List<Event>>() {
-                    @Override
-                    public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
-                        List<Event> body = response.body();
-                        for (Event event : body) {
-                            Log.d(TAG, "event: " + event.toString());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
-                        Log.e(TAG, "Failure: " + t.getLocalizedMessage());
-                    }
-                });
-            }
-        }).start();
-
+        eventService = ReportingApi.getEventInstance(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        locationProvider.subscribe(this, new LocationProvider.LocationInterface() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Log.d(TAG, "Location changed: " + location + " lat: " + location.getLatitude() + " lng: " + location.getLongitude());
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        locationProvider.unsubscribe();
+    }
 
     /**
      * Manipulates the map once available.
@@ -97,9 +104,46 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                eventService.listAllEvents().enqueue(new Callback<List<Event>>() {
+                    @Override
+                    public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
+                        List<Event> body = response.body();
+
+                        if (body == null) {
+                            Log.e(TAG, "Empty response body");
+                            return;
+                        }
+
+                        int i = 0;
+                        for (Event event : body) {
+                            Log.d(TAG, "event: " + event.toString());
+                            LatLng sydney = new LatLng(-34 + i, 151 + i);
+                            map.addMarker(new MarkerOptions().position(sydney).title(event.description));
+                            i+=2;
+
+                        }
+
+                        // Add a marker in Sydney and move the camera
+                        LatLng sydney = new LatLng(-34, 151);
+                        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
+                        Log.e(TAG, "Failure: " + t.getLocalizedMessage());
+                        Toast.makeText(EventsActivity.this, "Could not fetch the latest events", Toast.LENGTH_SHORT).show(); // @todo move string to the correct place
+                    }
+                });
+            }
+        }).start();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        hasPermissions = Permissions.resultingPermissions(requestCode, permissions, grantResults);
     }
 }

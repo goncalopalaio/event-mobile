@@ -1,9 +1,13 @@
 package com.gplio.event_mobile;
 
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,6 +36,29 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        BottomNavigationView bottomNavigationView = (BottomNavigationView)
+                findViewById(R.id.bottom_navigation);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_map:
+                            case R.id.action_list:
+                        }
+                        return true;
+                    }
+                });
+
+        FloatingActionButton fab = findViewById(R.id.floatingActionButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
+
+        // @todo goncalo remove this after listing is implemented
         final ReportingApi.EventService eventInstance = ReportingApi.getEventInstance();
 
         new Thread(new Runnable() {

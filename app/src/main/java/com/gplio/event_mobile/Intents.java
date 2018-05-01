@@ -3,6 +3,7 @@ package com.gplio.event_mobile;
 import android.content.Context;
 import android.content.Intent;
 
+import com.gplio.event_mobile.activities.DetailsActivity;
 import com.gplio.event_mobile.models.Event;
 
 /**

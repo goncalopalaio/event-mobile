@@ -59,7 +59,7 @@ public class LocationProvider {
         locationManager.removeUpdates(locationListener);
     }
 
-    interface LocationInterface {
+    public interface LocationInterface {
         public void onLocationChanged(Location location);
     }
 }

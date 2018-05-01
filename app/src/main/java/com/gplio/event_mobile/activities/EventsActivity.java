@@ -1,4 +1,4 @@
-package com.gplio.event_mobile;
+package com.gplio.event_mobile.activities;
 
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -6,7 +6,10 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -17,6 +20,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.gplio.event_mobile.Intents;
+import com.gplio.event_mobile.LocationProvider;
+import com.gplio.event_mobile.Permissions;
+import com.gplio.event_mobile.R;
+import com.gplio.event_mobile.ReportingApi;
+import com.gplio.event_mobile.fragments.CategoryListDialogFragment;
 import com.gplio.event_mobile.models.Event;
 
 import java.util.List;
@@ -25,17 +34,21 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class EventsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class EventsActivity extends AppCompatActivity implements OnMapReadyCallback, CategoryListDialogFragment.Listener {
     private static String TAG = "EventsActivity";
     private ReportingApi.EventService eventService;
     private LocationProvider locationProvider;
     private GoogleMap map;
     private boolean hasPermissions;
+    private Toolbar toolbar;
+    private BottomNavigationView bottomNavigationView;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_events);
+        bindViews();
 
         // Request permissions
         Permissions.requestPermissions(this);
@@ -47,8 +60,6 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -62,7 +73,6 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
                     }
                 });
 
-        FloatingActionButton fab = findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -71,6 +81,14 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
         });
 
         eventService = ReportingApi.getEventInstance(this);
+    }
+
+    private void bindViews() {
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        fab = findViewById(R.id.floatingActionButton);
+
     }
 
     @Override
@@ -95,8 +113,6 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -123,7 +139,7 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
                             Log.d(TAG, "event: " + event.toString());
                             LatLng sydney = new LatLng(-34 + i, 151 + i);
                             map.addMarker(new MarkerOptions().position(sydney).title(event.description));
-                            i+=2;
+                            i += 2;
 
                         }
 
@@ -146,5 +162,29 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         hasPermissions = Permissions.resultingPermissions(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_filter:
+                CategoryListDialogFragment.newInstance().show(getSupportFragmentManager(), "CategoryListDialogFragment");
+                return true;
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public void onCategoryClicked(int position) {
+
     }
 }

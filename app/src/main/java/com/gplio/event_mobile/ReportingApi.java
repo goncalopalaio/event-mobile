@@ -2,6 +2,7 @@ package com.gplio.event_mobile;
 
 import android.content.Context;
 
+import com.gplio.event_mobile.models.Category;
 import com.gplio.event_mobile.models.Event;
 
 import java.util.List;
@@ -19,10 +20,10 @@ import retrofit2.http.POST;
  * Created by goncalopalaio on 29/04/18.
  */
 
-class ReportingApi {
+public class ReportingApi {
     private static EventService service;
 
-    static EventService getEventInstance(Context context) {
+    public static EventService getEventInstance(Context context) {
         if (service == null) {
             service = build(context);
         }
@@ -50,6 +51,9 @@ class ReportingApi {
     public interface EventService {
         @GET("events/")
         Call<List<Event>> listAllEvents();
+
+        @GET("categories/")
+        Call<List<Category>> listAllCategories();
 
         @POST("events/")
         Call<Event> createEvent(@Body Event event);

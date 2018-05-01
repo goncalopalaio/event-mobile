@@ -5,10 +5,6 @@
         android:id="@+id/action_map"
         android:enabled="true"
         android:title="@string/text_map"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_list"
-        android:enabled="true"
-        android:title="@string/text_list"
+        android:icon="@mipmap/ic_layers_white_24dp"
         app:showAsAction="ifRoom" />
 </menu>

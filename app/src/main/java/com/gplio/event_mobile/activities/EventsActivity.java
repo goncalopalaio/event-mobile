@@ -66,7 +66,6 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.action_map:
-                            case R.id.action_list:
                         }
                         return true;
                     }

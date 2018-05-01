@@ -17,6 +17,7 @@ Server at: https://github.com/goncalopalaio/event-server/
 
 - Create a new event with a custom category
 - Extensive filtering options
+- Configurable user name. Currently the device ID is used.
 
 ## A few notes
 

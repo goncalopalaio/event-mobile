@@ -66,6 +66,7 @@ public class EventsActivity extends FragmentActivity implements OnMapReadyCallba
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intents.openDetails(EventsActivity.this, new Event("TEST EVENT"));
             }
         });
 

@@ -11,7 +11,9 @@ import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 
 /**
  * Created by goncalopalaio on 29/04/18.
@@ -48,5 +50,8 @@ class ReportingApi {
     public interface EventService {
         @GET("events/")
         Call<List<Event>> listAllEvents();
+
+        @POST("events/")
+        Call<Event> createEvent(@Body Event event);
     }
 }

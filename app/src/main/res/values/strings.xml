@@ -3,4 +3,6 @@
     <string name="title_activity_events">Events</string>
     <string name="text_list">Events</string>
     <string name="text_map">Map</string>
+    <string name="title_activity_details">Details</string>
+    <string name="description_hint">Description</string>
 </resources>

@@ -1,16 +1,13 @@
 package com.gplio.event_mobile.activities;
 
-import android.graphics.Point;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,7 +76,7 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onClick(View view) {
                 Location lastLocation = locationProvider.getLastLocation();
-                if (lastLocation == null ) {
+                if (lastLocation == null) {
                     Intents.openNew(EventsActivity.this);
                 } else {
                     Intents.openNew(EventsActivity.this, lastLocation.getLatitude(), lastLocation.getLongitude());
@@ -147,33 +144,7 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
         new Thread(new Runnable() {
             @Override
             public void run() {
-                eventService.listAllEvents().enqueue(new Callback<List<Event>>() {
-                    @Override
-                    public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
-                        List<Event> body = response.body();
-
-                        if (body == null) {
-                            Log.e(TAG, "Empty response body");
-                            return;
-                        }
-
-                        for (Event event : body) {
-                            Log.d(TAG, "event: " + event.toString());
-
-                            LatLng latLon = event.getLocationAsLatLng();
-                            if (latLon != null) {
-                                MarkerOptions position = new MarkerOptions().position(latLon).title(event.description);
-                                map.addMarker(position);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
-                        Log.e(TAG, "Failure: " + t.getLocalizedMessage());
-                        Toast.makeText(EventsActivity.this, "Could not fetch the latest events", Toast.LENGTH_SHORT).show(); // @todo move string to the correct place
-                    }
-                });
+                eventService.listAllEvents().enqueue(listEventsCallback);
             }
         }).start();
     }
@@ -189,6 +160,9 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
             case R.id.action_filter:
                 CategoryListDialogFragment.newInstance().show(getSupportFragmentManager(), "CategoryListDialogFragment");
                 return true;
+            case R.id.action_all:
+                fetchEvents();
+                return true;
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
@@ -203,7 +177,47 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
     }
 
     @Override
-    public void onCategoryClicked(int position) {
+    public void onCategoryClicked(final int position) {
+        if (map == null) {
+            Log.e(TAG, "onCategoryClicked: Map not ready");
+            return;
+        }
 
+        map.clear();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                eventService.filterByCategory(position + 1).enqueue(listEventsCallback); // @note using the position might not be the greatest idea in the long run
+            }
+        }).start();
     }
+
+    Callback<List<Event>> listEventsCallback = new Callback<List<Event>>() {
+        @Override
+        public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
+            List<Event> body = response.body();
+
+            if (body == null) {
+                Log.e(TAG, "Empty response body");
+                return;
+            }
+
+            for (Event event : body) {
+                Log.d(TAG, "event: " + event.toString());
+
+                LatLng latLon = event.getLocationAsLatLng();
+                if (latLon != null) {
+                    MarkerOptions position = new MarkerOptions().position(latLon).title(event.description);
+                    map.addMarker(position);
+                }
+            }
+        }
+
+        @Override
+        public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
+            Log.e(TAG, "Failure: " + t.getLocalizedMessage());
+            Toast.makeText(EventsActivity.this, "Could not fetch the latest events", Toast.LENGTH_SHORT).show(); // @todo move string to the correct place
+        }
+    };
 }

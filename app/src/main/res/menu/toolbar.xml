@@ -4,4 +4,8 @@
         android:id="@+id/action_filter"
         android:title="@string/filter"
         app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_all"
+        android:title="@string/show_all"
+        app:showAsAction="ifRoom"/>
 </menu>

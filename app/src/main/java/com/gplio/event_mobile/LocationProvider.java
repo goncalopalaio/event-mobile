@@ -3,6 +3,7 @@ package com.gplio.event_mobile;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -26,10 +27,26 @@ public class LocationProvider {
 
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+           return;
+        }
+
         if (locationManager == null) {
             Log.e(TAG, "Could not get location service");
             return;
         }
+
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, false);
+        Location lastKnownLocation = locationManager
+                .getLastKnownLocation(bestProvider);
+
+        if (lastKnownLocation != null) {
+            Log.d(TAG, "subscribe: lastKnownLocation: " + lastKnownLocation);
+            listener.onLocationChanged(lastKnownLocation);
+            lastLocation = lastKnownLocation;
+        }
+
 
         // Define a listener that responds to location updates
         locationListener = new LocationListener() {

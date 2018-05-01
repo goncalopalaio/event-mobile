@@ -16,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 /**
  * Created by goncalopalaio on 29/04/18.
@@ -61,5 +62,8 @@ public class ReportingApi {
 
         @POST("events/")
         Call<Event> createEvent(@Body Event event);
+
+        @GET("events/")
+        Call<List<Event>> filterByCategory(@Query("category_id") int categoryId);
     }
 }

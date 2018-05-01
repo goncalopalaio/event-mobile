@@ -6,4 +6,5 @@
     <string name="title_activity_details">Details</string>
     <string name="description_hint">Description</string>
     <string name="filter">Filter</string>
+    <string name="show_all">all</string>
 </resources>

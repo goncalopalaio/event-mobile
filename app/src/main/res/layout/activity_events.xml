@@ -52,7 +52,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:clickable="true"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@mipmap/ic_add_location_white_24dp"
         android:tint="@color/white"
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"

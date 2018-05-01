@@ -23,6 +23,7 @@ This is a debug APK. Install from external sources must be supported.
 This is extremely incomplete. 
 Here's a list of what should be improved beyond the obvious:
 
+- Better UI feedback. While saving an event there's no indication of failure or sucess at this time.
 - Possibility to view current events. (already supported by the server) 
 - Possibility to update events. (already supported by the server)
 - Full data support. Not all data sent from the server is shown.

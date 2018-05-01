@@ -209,6 +209,8 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
                 LatLng latLon = event.getLocationAsLatLng();
                 if (latLon != null) {
                     MarkerOptions position = new MarkerOptions().position(latLon).title(event.description);
+                    position = Event.addMarkerColor(event, position);
+
                     map.addMarker(position);
                 }
             }

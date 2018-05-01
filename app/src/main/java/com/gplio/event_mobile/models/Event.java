@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.gplio.event_mobile.Utils;
 
 import java.io.Serializable;
@@ -67,6 +69,37 @@ public class Event implements Serializable {
         }
 
         return null;
+    }
+
+    public static MarkerOptions addMarkerColor(Event event, MarkerOptions marker) {
+        float color;
+        switch (event.category) {
+            case 1:
+                color = BitmapDescriptorFactory.HUE_ORANGE;
+                break;
+            case 2:
+                color = BitmapDescriptorFactory.HUE_YELLOW;
+                break;
+            case 3:
+                color = BitmapDescriptorFactory.HUE_GREEN;
+                break;
+            case 4:
+                color = BitmapDescriptorFactory.HUE_CYAN;
+                break;
+            case 5:
+                color = BitmapDescriptorFactory.HUE_AZURE;
+                break;
+            case 6:
+                color = BitmapDescriptorFactory.HUE_BLUE;
+                break;
+
+            default:
+                color = BitmapDescriptorFactory.HUE_ROSE;
+                break;
+        }
+
+        return marker.icon(BitmapDescriptorFactory
+                .defaultMarker(color));
     }
 
     @Override

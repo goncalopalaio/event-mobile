@@ -35,3 +35,9 @@ Here's a list of what should be improved beyond the obvious:
 - Improve UX.
 - Generate a release apk. Currently this is unsupported until a google maps api key is added to the release version.
 - Improve handling of background tasks. There's some dropped frames in a few places.
+
+Screenshots:
+
+![alt text](https://raw.githubusercontent.com/goncalopalaio/event-mobile/master/screens/device-2018-05-01-222018.png "")
+![alt text](https://raw.githubusercontent.com/goncalopalaio/event-mobile/master/screens/device-2018-05-01-222038.png "")
+![alt text](https://raw.githubusercontent.com/goncalopalaio/event-mobile/master/screens/device-2018-05-01-222121.png "")

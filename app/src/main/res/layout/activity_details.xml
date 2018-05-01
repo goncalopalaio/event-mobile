@@ -15,20 +15,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="260dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             tools:context="com.gplio.event_mobile.activities.DetailsActivity" />
-
-        <EditText
-            android:id="@+id/authorEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:ems="10"
-            android:hint="Author"
-            android:inputType="text"
-            android:maxLines="1" />
 
         <EditText
             android:id="@+id/descriptionTextView"
@@ -49,16 +36,6 @@
             android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="Localization" />
-
-
-        <TextView
-            android:id="@+id/creationDateTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:ems="10"
-            android:hint="Creation Date" />
 
         <Button
             android:id="@+id/saveButton"

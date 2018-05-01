@@ -1,5 +1,6 @@
 package com.gplio.event_mobile.activities;
 
+import android.graphics.Point;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,7 +78,13 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intents.openDetails(EventsActivity.this, new Event("TEST EVENT"));
+                Location lastLocation = locationProvider.getLastLocation();
+                if (lastLocation == null ) {
+                    Intents.openNew(EventsActivity.this);
+                } else {
+                    Intents.openNew(EventsActivity.this, lastLocation.getLatitude(), lastLocation.getLongitude());
+                }
+
             }
         });
 
@@ -99,8 +107,14 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onLocationChanged(Location location) {
                 Log.d(TAG, "Location changed: " + location + " lat: " + location.getLatitude() + " lng: " + location.getLongitude());
+                if (map != null) {
+                    LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+                    map.moveCamera(CameraUpdateFactory.newLatLng(position));
+                }
             }
         });
+
+        fetchEvents();
     }
 
     @Override
@@ -120,6 +134,15 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        map.animateCamera(CameraUpdateFactory.zoomTo(10.0f));
+        fetchEvents();
+    }
+
+    private void fetchEvents() {
+        if (map == null) {
+            Log.e(TAG, "fetchEvents: Map not ready");
+            return;
+        }
 
         new Thread(new Runnable() {
             @Override
@@ -134,19 +157,15 @@ public class EventsActivity extends AppCompatActivity implements OnMapReadyCallb
                             return;
                         }
 
-                        int i = 0;
                         for (Event event : body) {
                             Log.d(TAG, "event: " + event.toString());
-                            LatLng sydney = new LatLng(-34 + i, 151 + i);
-                            map.addMarker(new MarkerOptions().position(sydney).title(event.description));
-                            i += 2;
 
+                            LatLng latLon = event.getLocationAsLatLng();
+                            if (latLon != null) {
+                                MarkerOptions position = new MarkerOptions().position(latLon).title(event.description);
+                                map.addMarker(position);
+                            }
                         }
-
-                        // Add a marker in Sydney and move the camera
-                        LatLng sydney = new LatLng(-34, 151);
-                        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
                     }
 
                     @Override

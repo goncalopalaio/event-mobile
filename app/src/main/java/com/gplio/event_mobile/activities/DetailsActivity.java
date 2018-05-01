@@ -35,6 +35,7 @@ public class DetailsActivity extends FragmentActivity implements OnMapReadyCallb
     private TextView locationTextView;
     private Button saveButton;
     private LatLng location;
+    private LatLng initialLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,14 @@ public class DetailsActivity extends FragmentActivity implements OnMapReadyCallb
             return;
         }
 
+        if (intent.hasExtra(Intents.EXTRA_DETAILS_LAST_LAT) && intent.hasExtra(Intents.EXTRA_DETAILS_LAST_LON)) {
+            double lat = intent.getDoubleExtra(Intents.EXTRA_DETAILS_LAST_LAT, 0);
+            double lon = intent.getDoubleExtra(Intents.EXTRA_DETAILS_LAST_LON, 0);
+            initialLocation = new LatLng(lat, lon);
+            location = initialLocation;
+            locationTextView.setText(Utils.lonLatToPoint(lon, lat));
+        }
+
         Event event = (Event) intent.getSerializableExtra(Intents.EXTRA_DETAILS);
         if (event == null) {
             return;
@@ -80,7 +89,13 @@ public class DetailsActivity extends FragmentActivity implements OnMapReadyCallb
 
     private void saveCurrentEvent() {
         String description = Utils.safeGetText(descriptionEditText);
-        Event event = new Event(description);
+
+        if (location == null) {
+            Log.e(TAG, "saveCurrentEvent: attempt to save without location");
+            return;
+        }
+
+        Event event = new Event(description, location.longitude, location.latitude);
         saveEvent(event);
     }
 
@@ -114,13 +129,19 @@ public class DetailsActivity extends FragmentActivity implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
+        if (initialLocation != null) {
+            map.addMarker(new MarkerOptions().position(initialLocation));
+            map.moveCamera(CameraUpdateFactory.newLatLng(initialLocation));
+        }
+        map.animateCamera(CameraUpdateFactory.zoomTo(10.0f));
+
         map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
                 map.clear();
 
                 location = latLng;
-                locationTextView.setText(latLng.toString());
+                locationTextView.setText(Utils.lonLatToPoint(latLng.longitude, latLng.latitude));
 
                 MarkerOptions markerOptions = new MarkerOptions().position(latLng);
 

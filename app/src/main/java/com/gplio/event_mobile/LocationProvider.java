@@ -19,6 +19,7 @@ public class LocationProvider {
 
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private Location lastLocation;
 
     public void subscribe(Context context, final LocationInterface listener) {
         // Acquire a reference to the system Location Manager
@@ -35,6 +36,8 @@ public class LocationProvider {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
                 listener.onLocationChanged(location);
+
+                lastLocation = location;
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -52,7 +55,11 @@ public class LocationProvider {
         }
 
         // Register the listener with the Location Manager to receive location updates
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000 * 60, 0, locationListener);
+    }
+
+    public Location getLastLocation() {
+        return lastLocation;
     }
 
     public void unsubscribe() {

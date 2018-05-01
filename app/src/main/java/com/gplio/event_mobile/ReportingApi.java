@@ -9,6 +9,7 @@ import java.util.List;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -36,8 +37,11 @@ public class ReportingApi {
     private static EventService build(Context context) {
         int cacheSize = 50 * 1024 * 1024; // 50 MB
         Cache cache = new Cache(context.getCacheDir(), cacheSize);
+        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
+
         OkHttpClient client = new OkHttpClient.Builder()
                 .cache(cache)
+                .addInterceptor(httpLoggingInterceptor)
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()

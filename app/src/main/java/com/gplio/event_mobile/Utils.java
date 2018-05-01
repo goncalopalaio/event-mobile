@@ -17,4 +17,8 @@ public class Utils {
         }
         return text.toString();
     }
+
+    public static String lonLatToPoint(double lon, double lat) {
+        return "SRID=4326;POINT(" + lon + " " + lat + ")";
+    }
 }

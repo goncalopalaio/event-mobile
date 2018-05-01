@@ -80,7 +80,9 @@ public class LocationProvider {
     }
 
     public void unsubscribe() {
-        locationManager.removeUpdates(locationListener);
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
+        }
     }
 
     public interface LocationInterface {

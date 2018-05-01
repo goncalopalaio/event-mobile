@@ -61,35 +61,40 @@ public class CategoryListDialogFragment extends BottomSheetDialogFragment {
 
         final Handler mainHandler = new Handler();
 
-        ReportingApi.getEventInstance(getContext()).listAllCategories().enqueue(new Callback<List<Category>>() {
+        new Thread(new Runnable() {
             @Override
-            public void onResponse(@NonNull Call<List<Category>> call, @NonNull Response<List<Category>> response) {
-                final List<Category> categoryList = response.body();
-                if (categoryList == null) {
-                    Log.e(TAG, "onResponse: Empty body");
-                    return;
-                }
-                mainHandler.post(new Runnable() {
+            public void run() {
+                ReportingApi.getEventInstance(getContext()).listAllCategories().enqueue(new Callback<List<Category>>() {
                     @Override
-                    public void run() {
-                        categoryAdapter.data = categoryList;
-                        categoryAdapter.notifyDataSetChanged();
+                    public void onResponse(@NonNull Call<List<Category>> call, @NonNull Response<List<Category>> response) {
+                        final List<Category> categoryList = response.body();
+                        if (categoryList == null) {
+                            Log.e(TAG, "onResponse: Empty body");
+                            return;
+                        }
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                categoryAdapter.data = categoryList;
+                                categoryAdapter.notifyDataSetChanged();
+                            }
+                        });
                     }
-                });
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<List<Category>> call, @NonNull Throwable t) {
-                Log.e(TAG, "onFailure: " + t);
-                mainHandler.post(new Runnable() {
                     @Override
-                    public void run() {
-                        categoryAdapter.data.clear();
-                        categoryAdapter.notifyDataSetChanged();
+                    public void onFailure(@NonNull Call<List<Category>> call, @NonNull Throwable t) {
+                        Log.e(TAG, "onFailure: " + t);
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                categoryAdapter.data.clear();
+                                categoryAdapter.notifyDataSetChanged();
+                            }
+                        });
                     }
                 });
             }
-        });
+        }).start();
     }
 
     @Override

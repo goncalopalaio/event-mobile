@@ -6,6 +6,8 @@ https://github.com/goncalopalaio/event-mobile/blob/master/apks/event-mobile.apk?
 
 This is a debug APK. Install from external sources must be supported.
 
+Server at: https://github.com/goncalopalaio/event-server/
+
 ## Supported features
 - List current events
 - Filter current events based in their category
